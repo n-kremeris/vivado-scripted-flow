@@ -1,6 +1,6 @@
 #!/bin/bash
-GUI=
-if [ "$1" == "waves" ]; then 
+GUI=-R
+if [ "$1" == "waves" ]; then
         GUI=--gui
 fi
 SOURCES_SV=" \
@@ -21,7 +21,7 @@ echo "### COMPILING SYSTEMVERILOG ###"
 xvlog --sv $COMP_OPTS_SV $DEFINES_SV $SOURCES_SV
 if [ $? -ne 0 ]; then
     echo "### SYSTEMVERILOG COMPILATION FAILED ###"
-    exit 10 
+    exit 10
 fi
 
 echo
@@ -36,12 +36,18 @@ echo
 echo "### ELABORATING ###"
 xelab -debug all -top tb -snapshot adder_tb_snapshot
 if [ $? -ne 0 ]; then
-    echo "### VHDL COMPILATION FAILED ###"
+    echo "### ELABORATION FAILED ###"
     exit 12
 fi
 
 echo
 echo "### RUNNING SIMULATION ###"
-xsim adder_tb_snapshot -R $GUI
+xsim adder_tb_snapshot -R
+
+if [ "$1" == "waves" ]; then
+    echo
+    echo "### OPENING WAVES ###"
+    xsim --gui adder_tb_snapshot.wdb
+fi
 
 exit 0

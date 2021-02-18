@@ -1,17 +1,40 @@
-// tb.sv
-// Module Description: testbench for the adder
-
 module tb ();
-    logic [31:0] a, b, sum;
+    logic [31:0] a, b, sum; // for the adder
+    logic [31:0] x, y, sub; // for the subtractor
 
-    adder DUT(.*); //instantiate the amazing adder
+    adder DUT_adder(.*); //instantiate the amazing adder
+
+    `ifdef SUBTRACTOR_VHDL
+        subtractor_vhdl DUT_subtractor
+        (   // wildcard (.*) connection not supported in XSIM for VHDL
+            .x(x),
+            .y(y),
+            .sub(sub)
+        );
+    `elsif SUBTRACTOR_SV
+        subtractor_systemverilog DUT_subtractor(.*);
+    `else
+        $fatal(1, "Subtractor DUT not selected, please define SUBTRACTOR_VHDL or SUBTRACTOR_SV");
+    `endif
 
     initial begin
-        a = 1;
-        b = 2;
+        `ifdef SUBTRACTOR_VHDL
+            $display("$$$ TESTBENCH: Using VHDL subtractor");
+        `elsif SUBTRACTOR_SV
+            $display("$$$ TESTBENCH: Using SystemVerilog subtractor");
+        `endif
+
         #1;
-        assert (sum == 3) else // Unless something went really wrong in the universe, we'd expect that 1+2=3
-            $fatal(1, "Well if we cant add 1 and 2 to get 3 then we really screwed something up");
-        $display("TB passed, adder ready to use in production");
+    	a = 1;
+    	b = 2;
+        x = 9;
+        y = 3;
+    	#1;
+    	assert (sum == 3) else
+    	    $fatal(1, "Adder failed");
+        assert (sub == 6) else
+            $fatal(1, "Subtractor failed");
+
+    	$display("TB passed, adder and subtractor ready to use in production");
     end
 endmodule : tb
