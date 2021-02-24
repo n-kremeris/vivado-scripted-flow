@@ -1,17 +1,33 @@
-SOURCES_SV= \
+SOURCES_SV := \
     ../SRC/adder.sv \
     ../SRC/subtractor.sv \
     ../SRC/tb.sv \
 
-COMP_OPTS_SV= \
+COMP_OPTS_SV := \
     --incr \
     --relax \
 
-DEFINES_SV= -d SUBTRACTOR_VHDL
-SOURCES_VHDL= ../SRC/subtractor.vhdl
-COMP_OPTS_VHDL= --incr --relax
+DEFINES_SV :=
+SOURCES_VHDL := ../SRC/subtractor.vhdl
+COMP_OPTS_VHDL := --incr --relax
 
-TB_TOP=tb
+TB_TOP := tb
+
+ADDER ?= VHDL
+ifeq ($(ADDER), VHDL)
+  $(info Building with VHDL adder)
+  DEFINES_SV := $(DEFINES_SV) -d SUBTRACTOR_VHDL
+else ifeq ($(ADDER), SV)
+  $(info Building with SYSTEMVERILOG adder)
+  DEFINES_SV := $(DEFINES_SV) -d SUBTRACTOR_SV
+else
+  $(info )
+  $(info BAD ADDER TYPE)
+  $(info Available options:)
+  $(info make ADDER=VHDL <target>)
+  $(info make ADDER=SV <target>)
+  $(error )
+endif
 
 #==== Default target - running simulation without drawing waveforms ====#
 .PHONY : simulate
@@ -51,7 +67,7 @@ ifeq ($(SOURCES_SV),)
 	@echo "### SKIPPED SYSTEMVERILOG COMPILATION ###"
     touch .comp_sv.timestamp
 else
-.comp_sv.timestamp : $(SOURCES_SV)
+.comp_sv.timestamp : $(SOURCES_SV) .adder_$(ADDER).timestamp
 	@echo
 	@echo "### COMPILING SYSTEMVERILOG ###"
 	xvlog --sv $(COMP_OPTS_SV) $(DEFINES_SV) $(SOURCES_SV)
@@ -69,13 +85,13 @@ else
 .comp_v.timestamp : $(SOURCES_V)
 	@echo
 	@echo "### COMPILING VERILOG ###"
-	xvlog --sv $(COMP_OPTS_V) $(DEFINES_V) $(SOURCES_V)
+	xvlog $(COMP_OPTS_V) $(DEFINES_V) $(SOURCES_V)
 	touch .comp_v.timestamp
 endif
 
 #==== COMPILING VHDL ====#
 ifeq ($(SOURCES_VHDL),)
-.comp_v.timestamp :
+.comp_vhdl.timestamp :
 	@echo
 	@echo "### NO VHDL SOURCES GIVEN ###"
 	@echo "### SKIPPED VHDL COMPILATION ###"
@@ -92,3 +108,8 @@ endif
 clean :
 	rm -rf *.jou *.log *.pb *.wdb xsim.dir
 	rm -rf .*.timestamp
+
+#==== Adder version marker generation ===#
+.adder_$(ADDER).timestamp :
+	@rm -rf .adder_*.timestamp
+	@touch .adder_$(ADDER).timestamp
