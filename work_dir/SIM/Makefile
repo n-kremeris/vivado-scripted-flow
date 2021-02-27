@@ -13,19 +13,19 @@ COMP_OPTS_VHDL := --incr --relax
 
 TB_TOP := tb
 
-ADDER ?= VHDL
-ifeq ($(ADDER), VHDL)
+SUB ?= VHDL
+ifeq ($(SUB), VHDL)
   $(info Building with VHDL adder)
   DEFINES_SV := $(DEFINES_SV) -d SUBTRACTOR_VHDL
-else ifeq ($(ADDER), SV)
+else ifeq ($(SUB), SV)
   $(info Building with SYSTEMVERILOG adder)
   DEFINES_SV := $(DEFINES_SV) -d SUBTRACTOR_SV
 else
   $(info )
-  $(info BAD ADDER TYPE)
+  $(info BAD SUBTRACTOR TYPE)
   $(info Available options:)
-  $(info make ADDER=VHDL <target>)
-  $(info make ADDER=SV <target>)
+  $(info make SUB=VHDL <target>)
+  $(info make SUB=SV <target>)
   $(error )
 endif
 
@@ -50,7 +50,7 @@ waves : $(TB_TOP)_snapshot.wdb
 $(TB_TOP)_snapshot.wdb : .elab.timestamp
 	@echo
 	@echo "### RUNNING SIMULATION ###"
-	xsim $(TB_TOP)_snapshot -R
+	xsim $(TB_TOP)_snapshot -tclbatch xsim_cfg.tcl
 
 #==== ELABORATION ====#
 .elab.timestamp : .comp_sv.timestamp .comp_v.timestamp .comp_vhdl.timestamp
@@ -67,7 +67,7 @@ ifeq ($(SOURCES_SV),)
 	@echo "### SKIPPED SYSTEMVERILOG COMPILATION ###"
     touch .comp_sv.timestamp
 else
-.comp_sv.timestamp : $(SOURCES_SV) .adder_$(ADDER).timestamp
+.comp_sv.timestamp : $(SOURCES_SV) .sub_$(ADDER).timestamp
 	@echo
 	@echo "### COMPILING SYSTEMVERILOG ###"
 	xvlog --sv $(COMP_OPTS_SV) $(DEFINES_SV) $(SOURCES_SV)
@@ -109,7 +109,7 @@ clean :
 	rm -rf *.jou *.log *.pb *.wdb xsim.dir
 	rm -rf .*.timestamp
 
-#==== Adder version marker generation ===#
-.adder_$(ADDER).timestamp :
-	@rm -rf .adder_*.timestamp
-	@touch .adder_$(ADDER).timestamp
+#==== Subtractor type marker generation ===#
+.sub_$(ADDER).timestamp :
+	@rm -rf .sub_*.timestamp
+	@touch .sub_$(ADDER).timestamp
