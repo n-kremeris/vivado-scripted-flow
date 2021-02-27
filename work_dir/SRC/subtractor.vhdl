@@ -1,3 +1,7 @@
+-- Basic VHDL subtractor
+-- Copyright Norbertas Kremeris 2021
+-- www.itsembedded.com
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;

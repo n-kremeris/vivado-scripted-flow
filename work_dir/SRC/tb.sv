@@ -1,3 +1,7 @@
+// Basic SystemVerilog mixed SV-VHDL testbench
+// Copyright Norbertas Kremeris 2021
+// www.itsembedded.com
+
 module tb ();
     logic [31:0] a, b, sum; // for the adder
     logic [31:0] x, y, sub; // for the subtractor

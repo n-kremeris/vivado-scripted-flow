@@ -1,3 +1,7 @@
+# Vivado Simulator Makefile based flow
+# Copyright Norbertas Kremeris 2021
+# www.itsembedded.com
+
 SOURCES_SV := \
     ../SRC/adder.sv \
     ../SRC/subtractor.sv \
