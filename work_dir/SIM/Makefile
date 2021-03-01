@@ -19,10 +19,10 @@ TB_TOP := tb
 
 SUB ?= VHDL
 ifeq ($(SUB), VHDL)
-  $(info Building with VHDL adder)
+  $(info Building with VHDL subtractor)
   DEFINES_SV := $(DEFINES_SV) -d SUBTRACTOR_VHDL
 else ifeq ($(SUB), SV)
-  $(info Building with SYSTEMVERILOG adder)
+  $(info Building with SYSTEMVERILOG subtractor)
   DEFINES_SV := $(DEFINES_SV) -d SUBTRACTOR_SV
 else
   $(info )
@@ -71,7 +71,7 @@ ifeq ($(SOURCES_SV),)
 	@echo "### SKIPPED SYSTEMVERILOG COMPILATION ###"
     touch .comp_sv.timestamp
 else
-.comp_sv.timestamp : $(SOURCES_SV) .sub_$(ADDER).timestamp
+.comp_sv.timestamp : $(SOURCES_SV) .sub_$(SUB).timestamp
 	@echo
 	@echo "### COMPILING SYSTEMVERILOG ###"
 	xvlog --sv $(COMP_OPTS_SV) $(DEFINES_SV) $(SOURCES_SV)
@@ -114,6 +114,6 @@ clean :
 	rm -rf .*.timestamp
 
 #==== Subtractor type marker generation ===#
-.sub_$(ADDER).timestamp :
+.sub_$(SUB).timestamp :
 	@rm -rf .sub_*.timestamp
-	@touch .sub_$(ADDER).timestamp
+	@touch .sub_$(SUB).timestamp
