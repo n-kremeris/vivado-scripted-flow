@@ -42,7 +42,7 @@ fi
 
 echo
 echo "### RUNNING SIMULATION ###"
-xsim adder_tb_snapshot -R
+xsim adder_tb_snapshot -tclbatch xsim_cfg.tcl
 
 if [ "$1" == "waves" ]; then
     echo
